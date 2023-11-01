@@ -5,8 +5,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ProblemDetail;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @ControllerAdvice
 public class ExceptionController {
@@ -33,6 +37,28 @@ return  errorMap;
         errorMap.setProperty("errorMessage","invalid user credentials");
 
         return  errorMap;
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public  ProblemDetail handleInvalidInputs(MethodArgumentNotValidException ex){
+
+        Map<String,String> errorMap= new HashMap<>();
+        ProblemDetail errorMessage=null;
+
+        errorMessage=ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
+
+        ex.getBindingResult()
+                        .getFieldErrors()
+                .forEach(err->{
+                    errorMap.put(err.getField(),err.getDefaultMessage());
+                });
+        errorMessage.setProperty("errorMessage",errorMap);
+        return  errorMessage;
+
+
+
+
+
     }
 
 }

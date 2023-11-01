@@ -3,6 +3,7 @@ package com.auth.authorizationserver.Controller;
 import com.auth.authorizationserver.Service.UserServiceImpl;
 import com.auth.authorizationserver.Tdo.AuthRequest;
 import com.auth.authorizationserver.Tdo.UserRequest;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,7 @@ public class CustomerController {
 
     @PostMapping("/newCustomer")
 
-    public ResponseEntity<?> createNewCustomer(@RequestBody UserRequest userRequest) throws Exception{
+    public ResponseEntity<?> createNewCustomer(@RequestBody  @Valid UserRequest userRequest)  throws  Exception{
 
         var customer= customerServiceImpl.saveNewCustomer(userRequest);
 
