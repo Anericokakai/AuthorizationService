@@ -1,12 +1,19 @@
 package com.auth.authorizationserver.Service;
 
-import com.auth.authorizationserver.Models.Roles;
+
+import com.auth.authorizationserver.Exceptions.UserExistException;
 import com.auth.authorizationserver.Models.Customers;
 import com.auth.authorizationserver.Respository.CustomerRespository;
+import com.auth.authorizationserver.Tdo.AuthRequest;
+import com.auth.authorizationserver.Tdo.AuthResponse;
 import com.auth.authorizationserver.Tdo.UserRequest;
 import com.auth.authorizationserver.Tdo.UserResponse;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -17,29 +24,58 @@ import java.util.Set;
 public class UserServiceImpl implements UserService {
     private  final ModelMapper modelMapper;
     private  final CustomerRespository customerRespository;
-    private Roles roles;
+    private final PasswordEncoder passwordEncoder;
+    private  final AuthenticationManager authenticationManager;
+    private  final  JWtService jWtService;
+
+
+//    ! CREATE NEW USER
+
     @Override
-    public UserResponse saveNewCustomer(UserRequest userRequest) {
-
-        Set<Roles> roles = new HashSet<>();
-        Roles roles1=Roles.builder()
-                .RoleName("ROLE_CUSTOMER").build();
-        roles.add(roles1);
+    public UserResponse saveNewCustomer(UserRequest userRequest) throws UserExistException {
 
 
-
+        if(!customerRespository.findCustomerBYEmail(userRequest.getEmail()).isEmpty()){
+            throw new UserExistException("user already exist");
+        }
 
         Customers newCustomer= Customers.builder()
-                .customerEmail(userRequest.getCustomerEmail())
-                .customerName(userRequest.getCustomerName()
+                .customerEmail(userRequest.getEmail())
+                .customerName(userRequest.getName()
                         )
-                .customerPassword(userRequest.getCustomerPassword())
-                .roles(roles).build();
+                .customerPassword(passwordEncoder.encode(userRequest.getPassword()))
+                .role("CUSTOMER").build();
 
 
 
         Customers savedCustomer= customerRespository.save(newCustomer);
 
         return null;
+    }
+
+
+//    ! authenticate the user
+
+
+
+    @Override
+    public AuthResponse authenticate(AuthRequest authRequest) {
+
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        authRequest.getEmail(),
+                        authRequest.getPassword()
+                )
+        );
+
+        var user= customerRespository.findCustomerBYEmail(authRequest.getEmail())
+                .orElseThrow(()->  new EntityNotFoundException("invalid login credentials"));
+
+        String token= jWtService.generateToken(user);
+
+        AuthResponse authResponse= AuthResponse.builder()
+                .token(token).build();
+
+        return  authResponse;
     }
 }

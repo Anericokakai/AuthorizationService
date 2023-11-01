@@ -2,17 +2,15 @@ package com.auth.authorizationserver.Models;
 
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @Builder
 @NoArgsConstructor
@@ -23,7 +21,6 @@ public class Customers implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private  int Id;
-
     private String  customerName;
     @Column(unique = true,nullable = false)
     private String  customerEmail;
@@ -31,10 +28,7 @@ public class Customers implements UserDetails {
     private  String username;
     @Column(nullable = false)
     private String customerPassword;
-    @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
-    @JoinTable(name = "user_roles",joinColumns =@JoinColumn(name ="user_id" )
-            ,inverseJoinColumns = @JoinColumn(name = "role_id"))
-    Set<Roles> roles;
+    private String role;
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;
@@ -47,7 +41,8 @@ public class Customers implements UserDetails {
 
     @Override
     public String getUsername() {
-        return customerEmail;
+
+        return this.customerEmail;
     }
 
     @Override

@@ -12,11 +12,11 @@ import org.hibernate.validator.constraints.Length;
 public class UserRequest {
    @NotNull(message = "name field cannot be blank")
 
-   private String customerName;
+   private String name;
    @Email(message = "email must be a valid email address")
-   private  String customerEmail;
+   private  String email;
    @Length(min = 6,message = "password must have atleast 6 characters")
-   private  String customerPassword;
+   private  String password;
 
 
 
