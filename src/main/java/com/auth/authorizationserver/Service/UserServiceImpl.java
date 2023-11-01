@@ -3,7 +3,9 @@ package com.auth.authorizationserver.Service;
 
 import com.auth.authorizationserver.Exceptions.UserExistException;
 import com.auth.authorizationserver.Models.Customers;
+import com.auth.authorizationserver.Models.Roles;
 import com.auth.authorizationserver.Respository.CustomerRespository;
+import com.auth.authorizationserver.Respository.RolesRepository;
 import com.auth.authorizationserver.Tdo.AuthRequest;
 import com.auth.authorizationserver.Tdo.AuthResponse;
 import com.auth.authorizationserver.Tdo.UserRequest;
@@ -16,6 +18,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -27,6 +30,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private  final AuthenticationManager authenticationManager;
     private  final  JWtService jWtService;
+    private  final RolesRepository rolesRepository;
 
 
 //    ! CREATE NEW USER
@@ -39,12 +43,17 @@ public class UserServiceImpl implements UserService {
             throw new UserExistException("user already exist");
         }
 
+        Roles roles=rolesRepository.findByName("CUSTOMER").get();
+
+
         Customers newCustomer= Customers.builder()
                 .customerEmail(userRequest.getEmail())
                 .customerName(userRequest.getName()
                         )
+                .roles(Collections.singletonList(roles))
+
                 .customerPassword(passwordEncoder.encode(userRequest.getPassword()))
-                .role("CUSTOMER").build();
+                .build();
 
 
 
@@ -73,9 +82,7 @@ public class UserServiceImpl implements UserService {
 
         String token= jWtService.generateToken(user);
 
-        AuthResponse authResponse= AuthResponse.builder()
+        return AuthResponse.builder()
                 .token(token).build();
-
-        return  authResponse;
     }
 }

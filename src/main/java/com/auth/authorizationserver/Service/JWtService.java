@@ -67,7 +67,8 @@ public class JWtService {
         return  Jwts.builder()
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
-                .setIssuedAt(new Date(System.currentTimeMillis()+ 1000*60*2))
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis()+ 1000*60*24))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
                 .compact();
 
@@ -90,12 +91,11 @@ public class JWtService {
     }
 
     private boolean isTokenExpired(String token) {
-
-        return extractExpiration(token);
+        return extractExpiration(token).before(new Date());
     }
 
-    private boolean extractExpiration(String token) {
-        return extractSingleClaim(token,Claims::getExpiration).before(new Date());
+    private Date extractExpiration(String token) {
+        return extractSingleClaim(token,Claims::getExpiration);
     }
 
 

@@ -25,32 +25,4 @@ public class AppConfigurations  {
     }
 
 
-//! create a user details service
-
-
-    @Bean
-    public UserDetailsService userDetailsService(){
-        return  username -> customerRespository.findCustomerBYEmail(username)
-                .orElseThrow(()->  new EntityNotFoundException("user with the given email does not exist"));
-    }
-
-    @Bean
-    public AuthenticationProvider authenticationProvider(){
-        DaoAuthenticationProvider authProvider=new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService());
-        authProvider.setPasswordEncoder(passwordEncoder());
-        return authProvider;
-
-    }
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception{
-
-        return configuration.getAuthenticationManager();
-
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder(){
-        return  new BCryptPasswordEncoder() ;
-    }
 }
