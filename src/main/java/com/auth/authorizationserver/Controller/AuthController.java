@@ -35,4 +35,11 @@ public class AuthController {
         return ResponseEntity.status(200).body(res);
 
     }
+
+
+    @GetMapping("/validate_token")
+    public  ResponseEntity<?> checkIfTheTokenIsValid(@RequestParam("token") String  token){
+
+        return  customerServiceImpl.tokenValidator(token);
+    }
 }

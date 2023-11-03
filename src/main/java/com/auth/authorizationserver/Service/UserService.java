@@ -12,4 +12,7 @@ public interface UserService {
     public UserResponse saveNewCustomer(UserRequest userRequest) throws UserExistException;
 
     public AuthResponse authenticate(AuthRequest authRequest);
+
+    public  ResponseEntity<?>  tokenValidator(String  token);
+
 }

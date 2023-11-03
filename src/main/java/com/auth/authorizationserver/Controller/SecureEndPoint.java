@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 public class SecureEndPoint {
     @GetMapping("/user")
-    @PreAuthorize("hasAuthority('CUSTOMER')")
+    @PreAuthorize("hasAnyAuthority('CUSTOMER','ADMIN')")
     public  String  user(){
         return  "hello from the secure end point";
 

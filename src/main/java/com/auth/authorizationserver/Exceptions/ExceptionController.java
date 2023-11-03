@@ -1,6 +1,7 @@
 package com.auth.authorizationserver.Exceptions;
 
 
+import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ProblemDetail;
@@ -15,14 +16,16 @@ import java.util.Map;
 @ControllerAdvice
 public class ExceptionController {
 
+    Map<String,String> errorMap= new HashMap<>();
+    ProblemDetail errorMessage=null;
+
     @ExceptionHandler(UserExistException.class)
     public  ProblemDetail handleUserExistException(UserExistException ex){
 
-        ProblemDetail errorMap=null;
 
-        errorMap=ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,ex.getMessage());
-        errorMap.setProperty("errorMessage",ex.getMessage());
-return  errorMap;
+        errorMessage=ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,ex.getMessage());
+        errorMessage.setProperty("errorMessage",ex.getMessage());
+return  errorMessage;
 
     }
 
@@ -31,19 +34,17 @@ return  errorMap;
     @ExceptionHandler(BadCredentialsException.class)
 
     public ProblemDetail handleSecurityException(BadCredentialsException ex){
-        ProblemDetail errorMap=null;
 
-        errorMap=ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(401), ex.getMessage());
-        errorMap.setProperty("errorMessage","invalid user credentials");
 
-        return  errorMap;
+        errorMessage=ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(401), ex.getMessage());
+        errorMessage.setProperty("errorMessage","invalid user credentials");
+
+        return  errorMessage;
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public  ProblemDetail handleInvalidInputs(MethodArgumentNotValidException ex){
 
-        Map<String,String> errorMap= new HashMap<>();
-        ProblemDetail errorMessage=null;
 
         errorMessage=ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
 
@@ -56,9 +57,21 @@ return  errorMap;
         return  errorMessage;
 
 
+    }
 
 
+    @ExceptionHandler(ExpiredJwtException.class)
+    public  ProblemDetail tokenExpired(ExpiredJwtException ex){
+
+        errorMessage=ProblemDetail.forStatus(HttpStatus.FORBIDDEN);
+
+        errorMap.put("errorMessage", ex.getMessage());
+
+        errorMessage.setProperty("errorMessage",errorMap);
+        return  errorMessage;
 
     }
+
+
 
 }

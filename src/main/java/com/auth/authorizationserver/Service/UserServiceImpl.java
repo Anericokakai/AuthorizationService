@@ -10,17 +10,20 @@ import com.auth.authorizationserver.Tdo.AuthRequest;
 import com.auth.authorizationserver.Tdo.AuthResponse;
 import com.auth.authorizationserver.Tdo.UserRequest;
 import com.auth.authorizationserver.Tdo.UserResponse;
+
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.net.URI;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +34,7 @@ public class UserServiceImpl implements UserService {
     private  final AuthenticationManager authenticationManager;
     private  final  JWtService jWtService;
     private  final RolesRepository rolesRepository;
+
 
 
 //    ! CREATE NEW USER
@@ -85,4 +89,21 @@ public class UserServiceImpl implements UserService {
         return AuthResponse.builder()
                 .token(token).build();
     }
+
+    @Override
+    public ResponseEntity<?> tokenValidator(String token) {
+
+//        Map<String ,String > messsage=new HashMap<>();
+//        boolean isTokenValid= jWtService.isTokenValid(token, userDetails);
+//
+//        if(isTokenValid){
+//            messsage.put("message","valid token");
+//            return  ResponseEntity.status(200).body(messsage);
+//        }
+//        messsage.put("message","invalid token");
+//        return   ResponseEntity.created(URI.create("/login")).body(messsage);
+//
+        return  null;
+  }
+
 }
