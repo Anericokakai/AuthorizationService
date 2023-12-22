@@ -1,25 +1,27 @@
 package com.auth.authorizationserver.Service;
 
+import com.auth.authorizationserver.Models.Customers;
+import com.auth.authorizationserver.Respository.CustomerRespository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
 
 @Service
+@RequiredArgsConstructor
 public class JWtService {
 
     private final String  SECRETE_KEY="5dA8B3F1eC7a6D9f2E0b8A5c7D4eF1a7B6d9C8E5F3a2B0c8A1D7e4F2";
-
+ private  final  CustomerRespository customerRespository;
 //? extract all the claims
 
     private Claims  extractAllClaims( String  token){
@@ -88,6 +90,12 @@ public class JWtService {
 
         return (username.equals(userDetails.getUsername())&&!isTokenExpired(token));
 
+    }
+    public  boolean ValidateTopicToken(String  token) throws EntityNotFoundException {
+
+        final  String email= extractEmail(token);
+        Optional<Customers> customer= customerRespository.findCustomerBYEmail(email);
+        return customer.isPresent() &&!isTokenExpired(token);
     }
 
     private boolean isTokenExpired(String token) {

@@ -25,8 +25,7 @@ public  class SecurityFilter {
 
         httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(
-                        req->req.requestMatchers("/authorize/**")
+                .authorizeHttpRequests(req->req.requestMatchers("/authorize/**")
                                 .permitAll()
                                 .anyRequest()
                                 .authenticated())

@@ -1,7 +1,11 @@
 package com.auth.authorizationserver.Exceptions;
 
 
+import com.fasterxml.jackson.core.io.JsonEOFException;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.SignatureException;
+import io.jsonwebtoken.io.DeserializationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ProblemDetail;
@@ -14,7 +18,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 @ControllerAdvice
-public class ExceptionController {
+
+public class FilterExceptionController {
 
     Map<String,String> errorMap= new HashMap<>();
     ProblemDetail errorMessage=null;
@@ -71,6 +76,20 @@ return  errorMessage;
         return  errorMessage;
 
     }
+
+//    ? malformed jwt exception
+
+    @ExceptionHandler(value = {SignatureException.class})
+    public ProblemDetail malformedToken(DeserializationException ex){
+
+        errorMessage=ProblemDetail.forStatus(HttpStatus.FORBIDDEN);
+        errorMap.put("errorMessage",ex.getMessage());
+
+        errorMessage.setProperty("errorMessage",errorMap);
+        return  errorMessage;
+    }
+
+
 
 
 
